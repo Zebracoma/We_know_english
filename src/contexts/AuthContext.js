@@ -19,6 +19,16 @@ export const AuthProvider = ({ children }) => {
     const [error, setError] = useState(null);
     const navigate = useNavigate();
 
+    const logout = useCallback((shouldNavigate = true) => {
+        setUser(null);
+        setError(null);
+        localStorage.removeItem('accessToken');
+        localStorage.removeItem('refreshToken');
+        if (shouldNavigate) {
+            navigate('/login');
+        }
+    }, [navigate]);
+
     // Функция для загрузки данных пользователя
     const fetchUser = useCallback(async () => {
         const token = localStorage.getItem('accessToken');
@@ -41,7 +51,7 @@ export const AuthProvider = ({ children }) => {
         } finally {
             setIsLoading(false);
         }
-    }, []);
+    }, [logout]);
 
     // Проверка аутентификации при загрузке приложения
     useEffect(() => {
@@ -128,16 +138,6 @@ export const AuthProvider = ({ children }) => {
             setIsLoading(false);
         }
     };
-
-    const logout = useCallback((shouldNavigate = true) => {
-        setUser(null);
-        setError(null);
-        localStorage.removeItem('accessToken');
-        localStorage.removeItem('refreshToken');
-        if (shouldNavigate) {
-            navigate('/login');
-        }
-    }, [navigate]);
 
     const clearError = useCallback(() => {
         setError(null);

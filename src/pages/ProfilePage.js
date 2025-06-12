@@ -1,5 +1,5 @@
 // src/pages/ProfilePage.js
-import React, { useEffect, useRef, useState, useCallback } from 'react'; // Добавил useCallback
+import React, { useEffect, useRef, useState } from 'react';
 import './ProfilePage.css';
 import { Chart, registerables } from 'chart.js';
 import { useAuth } from '../contexts/AuthContext';
@@ -98,7 +98,7 @@ const ProfilePage = () => {
             setIsLoading(false);
         }
 
-    }, [user, authLoading]);
+    }, [user, authLoading, levelTextMap]);
 
 
     // Обновление графика когда данные для него готовы
@@ -222,7 +222,6 @@ const ProfilePage = () => {
         };
 
         tabTriggers.forEach(triggerEl => {
-            const tab = new window.bootstrap.Tab(triggerEl); // Создаем экземпляр
             triggerEl.addEventListener('shown.bs.tab', handleTabShown);
         });
 
@@ -244,7 +243,7 @@ const ProfilePage = () => {
                 // }
             });
         };
-    }, []); // Пустой массив зависимостей для выполнения один раз
+    }, [activeTab]); // Пустой массив зависимостей для выполнения один раз
 
     const handleTabClick = (tabId) => {
         const tabEl = document.getElementById(`${tabId}-tab`);
