@@ -1,27 +1,30 @@
 // src/components/Navbar.js
 import React from 'react';
 import { Link, NavLink, useLocation, useNavigate } from 'react-router-dom';
+import { useAuth } from '../contexts/AuthContext';
 import './Navbar.css';
 
 function Navbar() {
   const location = useLocation();
   const navigate = useNavigate();
+  const { isAuthenticated, user, logout } = useAuth();
 
   const handleAboutClick = (e) => {
-    e.preventDefault(); // Отменяем стандартное поведение тега <a>
-    const targetId = 'features-section-anchor'; // ID нашей целевой секции
+    e.preventDefault();
+    const targetId = 'features-section-anchor';
 
-    // Если мы уже на главной странице ('/')
     if (location.pathname === '/') {
       const element = document.getElementById(targetId);
       if (element) {
         element.scrollIntoView({ behavior: 'smooth' });
       }
     } else {
-      // Если мы на другой странице, переходим на главную и добавляем хеш якоря
-      // MainPage.js затем обработает этот хеш и прокрутит к элементу
       navigate(`/#${targetId}`);
     }
+  };
+
+  const handleLogout = () => {
+    logout();
   };
 
   return (
@@ -55,18 +58,21 @@ function Navbar() {
                 Главная
               </NavLink>
             </li>
+            {isAuthenticated && (
+              <>
+                <li className="nav-item">
+                  <NavLink className="nav-link" to="/courses">
+                    Курсы
+                  </NavLink>
+                </li>
+                <li className="nav-item">
+                  <NavLink className="nav-link" to="/profile">
+                    Мой прогресс
+                  </NavLink>
+                </li>
+              </>
+            )}
             <li className="nav-item">
-              <NavLink className="nav-link" to="/courses">
-                Курсы
-              </NavLink>
-            </li>
-            <li className="nav-item">
-              <NavLink className="nav-link" to="/profile">
-                Мой прогресс
-              </NavLink>
-            </li>
-            <li className="nav-item">
-              {/* Используем тег <a> с обработчиком onClick и href для семантики/fallback */}
               <a 
                 className="nav-link" 
                 href="/#features-section-anchor" 
@@ -76,14 +82,41 @@ function Navbar() {
               </a>
             </li>
             <li className="nav-item ms-lg-2 mt-2 mt-lg-0">
-              <Link to="/login" className="btn btn-login">
-                <i className="fas fa-user me-2"></i>Войти
-              </Link>
+              {isAuthenticated ? (
+                <div className="dropdown">
+                  <button 
+                    className="btn btn-login dropdown-toggle" 
+                    type="button" 
+                    data-bs-toggle="dropdown" 
+                    aria-expanded="false"
+                  >
+                    <i className="fas fa-user me-2"></i>
+                    {user?.first_name || user?.username || 'Профиль'}
+                  </button>
+                  <ul className="dropdown-menu">
+                    <li>
+                      <Link className="dropdown-item" to="/profile">
+                        <i className="fas fa-user me-2"></i>Профиль
+                      </Link>
+                    </li>
+                    <li><hr className="dropdown-divider" /></li>
+                    <li>
+                      <button className="dropdown-item" onClick={handleLogout}>
+                        <i className="fas fa-sign-out-alt me-2"></i>Выйти
+                      </button>
+                    </li>
+                  </ul>
+                </div>
+              ) : (
+                <Link to="/login" className="btn btn-login">
+                  <i className="fas fa-user me-2"></i>Войти
+                </Link>
+              )}
             </li>
           </ul>
         </div>
       </div>
-    </nav>
+    </div>
   );
 }
 

@@ -1,30 +1,21 @@
 // src/services/apiService.js
-const BASE_URL = process.env.REACT_APP_API_URL || 'http://localhost:8000/api'; // Используйте ваш URL API из Swagger или Dockerfile
+const BASE_URL = process.env.REACT_APP_API_URL || 'http://localhost:8000/api';
 
-const getAuthToken = () => {
-    return localStorage.getItem('accessToken');
-};
+const getAuthToken = () => localStorage.getItem('accessToken');
+const getRefreshToken = () => localStorage.getItem('refreshToken');
 
-const getRefreshToken = () => {
-    return localStorage.getItem('refreshToken');
-};
-
-// Функция для обновления токена (нужно реализовать эндпоинт на бэкенде)
+// Функция для обновления токена
 const refreshToken = async () => {
     const currentRefreshToken = getRefreshToken();
     if (!currentRefreshToken) {
-        // Нет refresh токена, пользователь должен залогиниться снова
-        // Можно вызвать функцию logout или перенаправить на /login
         localStorage.removeItem('accessToken');
         localStorage.removeItem('refreshToken');
-        window.location.href = '/login'; // Простой вариант, лучше через React Router
-        return Promise.reject(new Error("No refresh token available."));
+        window.location.href = '/login';
+        throw new Error("No refresh token available");
     }
 
     try {
-        // Предполагаемый эндпоинт для обновления токена (вам нужно его создать на бэке)
-        // Он должен принимать refresh_token и возвращать новый access_token
-        const response = await fetch(`${BASE_URL}/auth/refresh-token`, { // Адаптируйте URL
+        const response = await fetch(`${BASE_URL}/auth/refresh-token`, {
             method: 'POST',
             headers: {
                 'Content-Type': 'application/json',
@@ -33,34 +24,31 @@ const refreshToken = async () => {
         });
 
         if (!response.ok) {
-            // Если refresh токен невалиден, удаляем токены и требуем логин
-            localStorage.removeItem('accessToken');
-            localStorage.removeItem('refreshToken');
-            window.location.href = '/login';
-            throw new Error('Failed to refresh token, session expired.');
+            throw new Error('Failed to refresh token');
         }
 
         const data = await response.json();
         localStorage.setItem('accessToken', data.access_token);
-        // Некоторые системы возвращают и новый refresh_token
+        
         if (data.refresh_token) {
             localStorage.setItem('refreshToken', data.refresh_token);
         }
+        
         return data.access_token;
     } catch (error) {
         console.error("Error refreshing token:", error);
         localStorage.removeItem('accessToken');
         localStorage.removeItem('refreshToken');
         window.location.href = '/login';
-        throw error; // Пробрасываем ошибку дальше
+        throw error;
     }
 };
-
 
 const request = async (endpoint, method = 'GET', body = null, isRetry = false) => {
     const headers = {
         'Content-Type': 'application/json',
     };
+    
     const token = getAuthToken();
     if (token) {
         headers['Authorization'] = `Bearer ${token}`;
@@ -71,22 +59,20 @@ const request = async (endpoint, method = 'GET', body = null, isRetry = false) =
         headers,
     };
 
-    if (body && (method === 'POST' || method === 'PUT' || method === 'PATCH')) { // PATCH добавлен
+    if (body && ['POST', 'PUT', 'PATCH'].includes(method)) {
         config.body = JSON.stringify(body);
     }
 
     try {
         const response = await fetch(`${BASE_URL}${endpoint}`, config);
 
-        if (response.status === 401 && !isRetry) {
-            // Попытка обновить токен и повторить запрос
+        // Обработка 401 ошибки - попытка обновить токен
+        if (response.status === 401 && !isRetry && getRefreshToken()) {
             try {
-                const newAccessToken = await refreshToken();
-                // Повторяем оригинальный запрос с новым токеном
-                // Устанавливаем isRetry в true, чтобы избежать бесконечного цикла
-                return request(endpoint, method, body, true); 
+                await refreshToken();
+                // Повторяем запрос с новым токеном
+                return request(endpoint, method, body, true);
             } catch (refreshError) {
-                // Если обновление токена не удалось, пробрасываем ошибку
                 throw refreshError;
             }
         }
@@ -96,20 +82,31 @@ const request = async (endpoint, method = 'GET', body = null, isRetry = false) =
             try {
                 errorData = await response.json();
             } catch (e) {
-                errorData = { detail: response.statusText, status: response.status };
+                errorData = { detail: response.statusText };
             }
-             // Пытаемся извлечь более детальное сообщение об ошибке
-            const message = errorData.detail || errorData.message || (errorData.errors && errorData.errors.length > 0 && errorData.errors[0].msg) || `HTTP error! status: ${response.status}`;
+            
+            const message = errorData.detail || 
+                           errorData.message || 
+                           (errorData.errors?.[0]?.msg) || 
+                           `HTTP error! status: ${response.status}`;
+            
             const error = new Error(message);
             error.status = response.status;
-            error.data = errorData; // Добавляем полные данные ошибки
+            error.data = errorData;
             throw error;
         }
 
-        if (response.status === 204) { // No Content
+        // Обработка пустого ответа
+        if (response.status === 204) {
             return null;
         }
-        return await response.json();
+
+        const contentType = response.headers.get('content-type');
+        if (contentType && contentType.includes('application/json')) {
+            return await response.json();
+        }
+        
+        return await response.text();
     } catch (error) {
         console.error('API call error:', endpoint, error);
         throw error;
@@ -120,6 +117,6 @@ export default {
     get: (endpoint) => request(endpoint, 'GET'),
     post: (endpoint, body) => request(endpoint, 'POST', body),
     put: (endpoint, body) => request(endpoint, 'PUT', body),
-    patch: (endpoint, body) => request(endpoint, 'PATCH', body), // Добавлен PATCH
+    patch: (endpoint, body) => request(endpoint, 'PATCH', body),
     delete: (endpoint) => request(endpoint, 'DELETE'),
 };
