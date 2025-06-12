@@ -1,0 +1,98 @@
+/* src/pages/CoursesPage.css */
+
+/* Стили для страницы курса (эти стили относятся к CoursesPage) */
+.course-hero {
+    position: relative;
+    border-radius: 15px;
+    overflow: hidden;
+    color: white;
+    padding: 80px 40px;
+    /* 
+      ВАЖНО: URL для фона. В React, если изображение находится в public/images,
+      путь будет /images/your-image.jpg.
+      Если изображение импортируется в JS, то оно будет обработано сборщиком.
+      Для простоты, предположим, что URL доступен.
+      Пример с локальным изображением из public/images/course-background.jpg:
+      background: linear-gradient(rgba(0,0,0,0.2), rgba(0,0,0,0.6)), 
+                  url('/images/course-background.jpg') center/cover;
+    */
+    background: linear-gradient(rgba(0,0,0,0.2), rgba(0,0,0,0.6)), 
+                url('https://images.unsplash.com/photo-1509062522246-3755977927d7?ixlib=rb-4.0.3&auto=format&fit=crop&w=1800&q=80') center/cover;
+    box-shadow: var(--card-shadow);
+}
+
+.course-hero h1 { 
+    font-weight: 800; 
+    text-shadow: 0 2px 4px rgba(0,0,0,0.3); 
+}
+
+.btn-hero { 
+    background: white; 
+    color: var(--primary-color); 
+    font-weight: 700; 
+    padding: 10px 30px; 
+    border-radius: 50px; 
+    transition: var(--transition); 
+    border: none; 
+    text-decoration: none; /* Добавлено для согласованности с Link/a */
+}
+
+.btn-hero:hover { 
+    transform: translateY(-3px); 
+    box-shadow: 0 8px 20px rgba(0,0,0,0.15); 
+}
+
+.progress-card, 
+.tabs-card { 
+    background: white; 
+    border-radius: 15px; 
+    padding: 25px; 
+    box-shadow: var(--card-shadow); 
+}
+
+/* Стили для табов внутри .tabs-card. */
+.tabs-card .nav-tabs { /* Чтобы убрать стандартную нижнюю границу у всего блока табов Bootstrap */
+    border-bottom: none;
+}
+
+.tabs-card .nav-tabs .nav-link { 
+    color: var(--dark-color); 
+    font-weight: 600;
+    border-bottom-width: 3px; /* Задаем толщину для неактивной вкладки тоже, но прозрачную */
+    border-color: transparent transparent transparent transparent !important; /* Убираем видимые рамки у неактивных */
+}
+
+.tabs-card .nav-tabs .nav-link:hover {
+    border-color: #e9ecef #e9ecef var(--accent-color) !important; /* Цвет при наведении, кроме нижней */
+    /* color: var(--primary-color); */ /* Опционально, если хотите менять цвет текста при наведении */
+}
+
+.tabs-card .nav-tabs .nav-link.active { 
+    color: var(--primary-color); 
+    background-color: white; /* Убедимся, что фон активной вкладки белый */
+    border-color: #dee2e6 #dee2e6 var(--primary-color) !important; /* Стандартные цвета Bootstrap для верхней/боковых + ваш цвет для нижней */
+    /* border-color: var(--primary-color) var(--primary-color) white !important; - альтернатива, если фон другой */
+}
+
+.lesson-list-item { 
+    transition: var(--transition); 
+    border-radius: 10px; 
+}
+
+.lesson-list-item:hover { 
+    background-color: #f8f9fa; /* Или var(--light-color) если он такой же */
+    transform: translateX(5px); 
+    box-shadow: 0 2px 8px rgba(0,0,0,0.05); 
+}
+
+.lesson-icon {
+    width: 50px; 
+    height: 50px;
+    background: linear-gradient(135deg, var(--accent-color), var(--primary-color));
+    color: white; 
+    border-radius: 50%; 
+    display: flex; 
+    align-items: center; 
+    justify-content: center;
+    flex-shrink: 0; /* Чтобы иконка не сжималась при маленьком контейнере */
+}

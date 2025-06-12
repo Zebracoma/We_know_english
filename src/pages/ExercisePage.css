@@ -1,0 +1,44 @@
+/* src/pages/ExercisePage.css */
+.exercise-page .card {
+    border: none; /* Убираем стандартную рамку, т.к. есть тень */
+}
+
+.exercise-page .card-header h4,
+.exercise-page .card-header h5 {
+    margin-bottom: 0.25rem;
+}
+
+.exercise-question {
+    margin-bottom: 1.5rem;
+    line-height: 1.6;
+}
+
+.options-group .form-check {
+    padding: 0.5rem 1rem;
+    border: 1px solid #eee;
+    border-radius: 0.375rem; /* Bootstrap's $border-radius */
+    transition: background-color 0.2s ease-in-out;
+}
+
+.options-group .form-check:hover {
+    background-color: #f8f9fa; /* Bootstrap's $gray-100 */
+}
+
+.options-group .form-check-input {
+    margin-top: 0.4em; /* Для лучшего выравнивания с текстом */
+}
+
+.options-group .form-check-label.text-success {
+    border-color: var(--bs-success-border-subtle);
+    background-color: var(--bs-success-bg-subtle);
+}
+.options-group .form-check-label.text-danger {
+    border-color: var(--bs-danger-border-subtle);
+    background-color: var(--bs-danger-bg-subtle);
+}
+
+.fill-gap-input { /* Если будете использовать специальный класс для инпута в fill_gap */
+    width: 150px; /* Пример */
+    display: inline-block;
+    margin: 0 5px;
+}

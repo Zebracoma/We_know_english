@@ -1,0 +1,65 @@
+/* src/pages/LoginPage.css */
+
+  
+  .login-card {
+    border: none;
+    border-radius: 15px;
+    box-shadow: 0 10px 30px rgba(0, 0, 0, 0.1);
+    width: 100%;
+    background-color: #fff;
+  }
+  
+  /* Стили для вкладок */
+  .nav-pills .nav-link {
+    border-radius: 50px;
+    font-weight: 600;
+    color: var(--primary-color, #0d6efd) !important; /* Убедимся, что цвет текста применен! */
+    background-color: transparent !important; /* Убедимся, что фон прозрачный для неактивных */
+    cursor: pointer;
+    border: 1px solid transparent; /* Для консистентности размеров */
+    transition: color 0.15s ease-in-out, background-color 0.15s ease-in-out, border-color 0.15s ease-in-out;
+  }
+  
+  .nav-pills .nav-link:hover {
+    /* Можно оставить стандартный ховер Bootstrap или определить свой */
+    /* color: var(--secondary-color, #0a58ca) !important; */
+    background-color: rgba(0,0,0,0.05) !important; /* Легкий фон при наведении */
+  }
+  
+  .nav-pills .nav-link.active {
+    background-color: var(--primary-color, #0d6efd) !important; /* Фон активной вкладки */
+    color: white !important; /* Текст активной вкладки */
+    border-color: var(--primary-color, #0d6efd) !important;
+  }
+  
+  /* Стили для полей ввода */
+  .form-control:focus {
+    border-color: var(--primary-color, #86b7fe);
+    box-shadow: 0 0 0 0.25rem rgba(67, 97, 238, 0.25); /* Используйте здесь RGB вашего --primary-color или конкретные значения */
+  }
+  
+  /* Стили для основной кнопки */
+  .btn-primary {
+    background-color: var(--primary-color, #0d6efd);
+    border-color: var(--primary-color, #0d6efd);
+    color: white;
+  }
+  .btn-primary:hover {
+    background-color: var(--secondary-color, #0a58ca);
+    border-color: var(--secondary-color, #024ea2);
+    color: white;
+  }
+  
+  /* Ссылка для входа администратора */
+  .admin-login-toggle {
+    color: var(--primary-color, #0d6efd);
+    text-decoration: none;
+  }
+  .admin-login-toggle:hover {
+    text-decoration: underline;
+    color: var(--secondary-color, #0a58ca);
+  }
+  
+  .card.login-card .card-body.bg-light {
+    background-color: #f8f9fa !important; /* Bootstrap .bg-light */
+  }
